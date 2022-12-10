@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+    <html>
+    
+        <head>
+            <title>Rucksack Reorganization 2</title>
+        </head>
+        
+        <body>
+            <label for="inputfile">Load input:</label>
+            <input type="file" name="inputfile" id="inputfile">
+            <h1>Rucksack Reorganization 2</h1>
+            <a href="https://adventofcode.com/2022/day/3">Advent of Code Challenge</a>
+            <pre id="answer"></pre>
+            <pre id="output"></pre>
+            
+            <script type="text/javascript">
+
+                document.getElementById('inputfile').addEventListener('change', function() {
+                    
+                    var fileReader = new FileReader();
+                    fileReader.onload = function(){
+                        var input = fileReader.result;
+                        var totalScore = getTotalPriority(input);
+
+                        var answer = 'The sum of the priorities are: ' + totalScore;
+
+                        document.getElementById('answer').textContent = answer;
+                        document.getElementById('output').textContent = input;
+                    }
+                    
+                    fileReader.readAsText(this.files[0]);
+                })
+
+                function getTotalPriority(inputString){
+                    var alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+
+                    var seperateRows = inputString.split('\r\n');
+
+                    var totalPriority = 0;
+                    for (var i = 0; i < seperateRows.length; i+=3){
+                        var elfRugsackOne = seperateRows[i];
+                        var elfRugsackTwo = seperateRows[i+1];
+                        var elfRugsackThree = seperateRows[i+2];
+
+                        for (var j = 0; j < elfRugsackOne.length; j++) {
+                            var secondRugsackContainsSameItem = elfRugsackTwo.indexOf(elfRugsackOne[j]) > -1;
+                            if(secondRugsackContainsSameItem){
+                                var thirdRugsackContainsSameItem = elfRugsackThree.indexOf(elfRugsackOne[j]) > -1;
+
+                                if(thirdRugsackContainsSameItem){
+                                    var itemInAllRugsacks = elfRugsackOne[j];
+                                    var priorityValue = alphabet.indexOf(itemInAllRugsacks) + 1;
+                                    totalPriority += priorityValue;
+                                    break;
+                                }
+                            }
+                        }
+
+                    }
+                    return totalPriority;
+                }
+            </script>
+        </body>
+</html>

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+    <html>
+    
+        <head>
+            <title>No Space Left On Device</title>
+        </head>
+        
+        <body>
+            <a href="https://adventofcode.com/2022/day/7">Advent of Code Challenge</a>
+            <h1>No Space Left On Device</h1>
+            
+            <label for="inputfile">Load input:</label>
+            <input type="file" name="inputfile" id="inputfile">
+            
+            <pre id="answer"></pre>
+            <pre id="output"></pre>
+            
+            <script type="text/javascript">
+
+                document.getElementById('inputfile').addEventListener('change', function() {  
+                    var fileReader = new FileReader();
+                    fileReader.onload = function(){
+                        var input = fileReader.result;
+                        var sum = getSum(input);
+
+                        var answer = 'The sum of the total sizes of those directories: ' + sum;
+
+                        document.getElementById('answer').textContent = answer;
+                        document.getElementById('output').textContent = input;
+                    }         
+                    fileReader.readAsText(this.files[0]);
+                })
+
+                function getSum(inputString, totalSize, spaceNeeded){      
+                    var directory = getDirectoryFromInstructions(inputString);
+                    calculateAndStoreDirectorySize(directory['/']);
+
+                    var maxSize = 100000;
+                    var viableDirectorySizes = getDirectoriesWithSizeSmallerThen(directory, maxSize);
+
+                    var sum = viableDirectorySizes.reduce(function(sum, dirSize){
+                        return sum + dirSize;
+                    })
+
+                    return sum; 
+                }
+
+                function getDirectoryFromInstructions(instructions){
+                        var currentDirectoryPath = '';
+                        var directory = {
+                            '/': {
+                                files: []
+                            }
+                        };
+                        
+                        var instructionRows = instructions.split('\r\n');
+                        instructionRows.forEach(function(instruction, i){
+                            var isCommand = instruction[0] === '$'
+                            if( isCommand && instruction[2] === 'c' ){
+                                var directoryRequest = instruction.split(' ')[2];
+                                switch (directoryRequest){
+                                    case '/':
+                                        currentDirectoryPath = "/";
+                                        break;
+                                    case '..': 
+                                        currentDirectoryPath = _setParentDirectory(currentDirectoryPath);
+                                        break;
+                                    default:
+                                        var requestedDirectory = currentDirectoryPath + '.' + directoryRequest;
+                                        currentDirectoryPath = _createChildDirectory(directory, requestedDirectory);
+                                        break;
+                                }
+                            }
+
+                            if(!isCommand && instruction.indexOf('dir') !== 0){
+                                var directoryPath = currentDirectoryPath.split('.');
+                                var dir = directory;
+                                directoryPath.forEach(function(level){
+                                    if (dir[level]){
+                                        dir = dir[level]
+                                    }
+                                });
+
+                                dir.files.push({
+                                    size: parseInt(instruction),
+                                    name: instruction.split(' ')[1]
+                                });
+                            }  
+                        });
+
+                        return directory;
+
+                        function _setParentDirectory(currentDirectory){
+                            var substringEnd = currentDirectory.lastIndexOf('.');
+                            return currentDirectory.substring(0, substringEnd);
+                        }
+
+                        function _createChildDirectory(directories, requestedChildPath){
+                            var directoryPath = requestedChildPath.split('.');
+                            var dir = directories;
+                            directoryPath.forEach(function(level){
+                                if (dir[level]){
+                                    dir = dir[level]
+                                } else {
+                                    dir[level] = {files: []};
+                                }
+                            });
+
+                            return requestedChildPath;
+                        }
+
+                    }
+                    
+                function calculateAndStoreDirectorySize(dir){
+                    dir.size = 0;
+
+                    for (var item in dir){
+                        if (Array.isArray(dir[item])){
+                            dir[item].forEach(function(file){
+                                dir.size += file.size;
+                            });
+                        } else if (item !== 'size') {
+                            dir.size += calculateAndStoreDirectorySize(dir[item]);
+                        }
+                    }
+
+                    return dir.size;
+                }
+
+                function getDirectoriesWithSizeSmallerThen(directory, maxSize, viableSizes){
+                        if (!viableSizes){
+                            viableSizes = [];
+                        }
+
+                        for (var item in directory){
+                            switch (item) {
+                                case 'files':
+                                    break;
+                                case 'size': 
+                                    if (directory.size <= maxSize){
+                                        viableSizes.push(directory.size);
+                                    }
+                                    break;
+                                default:
+                                    getDirectoriesWithSizeSmallerThen(directory[item], maxSize, viableSizes);
+                                    break;
+                            }
+                        }
+
+                        return viableSizes;
+                    }
+
+            </script>
+        </body>
+</html>

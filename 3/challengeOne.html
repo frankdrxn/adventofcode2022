@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+    <html>
+    
+        <head>
+            <title>Rucksack Reorganization</title>
+        </head>
+        
+        <body>
+            <label for="inputfile">Load input:</label>
+            <input type="file" name="inputfile" id="inputfile">
+            <h1>Rucksack Reorganization</h1>
+            <a href="https://adventofcode.com/2022/day/3">Advent of Code Challenge</a>
+            <pre id="answer"></pre>
+            <pre id="output"></pre>
+            
+            <script type="text/javascript">
+
+                document.getElementById('inputfile').addEventListener('change', function() {
+                    
+                    var fileReader = new FileReader();
+                    fileReader.onload = function(){
+                        var input = fileReader.result;
+                        var totalScore = getTotalPriority(input);
+
+                        var answer = 'The sum of the priorities are: ' + totalScore;
+
+                        document.getElementById('answer').textContent = answer;
+                        document.getElementById('output').textContent = input;
+                    }
+                    
+                    fileReader.readAsText(this.files[0]);
+                })
+
+                function getTotalPriority(inputString){
+                    var alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+
+                    var seperateRows = inputString.split('\r\n');
+
+                    var totalPriority = 0;
+                    seperateRows.forEach(function(rugsack){
+                        var middleIndex = Math.ceil(rugsack.length / 2);
+
+                        const firstCompartment = rugsack.substring(0, middleIndex);   
+                        const secondCompartment = rugsack.substring(middleIndex, rugsack.length);
+
+                        for (var i = 0; i < firstCompartment.length; i++) {
+                            var secondCompartmentContainsSameItem = secondCompartment.indexOf(firstCompartment[i]) > -1;
+                            if(secondCompartmentContainsSameItem){
+                                var itemInBothCompartments = firstCompartment[i];
+                                var priorityValue = alphabet.indexOf(itemInBothCompartments) + 1;
+                                totalPriority += priorityValue;
+                                break;
+                            }
+                        }
+                    });
+
+                    return totalPriority;
+                }
+            </script>
+        </body>
+</html>

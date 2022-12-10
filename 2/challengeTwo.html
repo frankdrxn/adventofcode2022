@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+    <html>
+    
+        <head>
+            <title>Rock Paper Scissors 2</title>
+        </head>
+        
+        <body>
+            <label for="inputfile">Load input:</label>
+            <input type="file" name="inputfile" id="inputfile">
+            <h1>Rock Paper Scissors 2</h1>
+            <a href="https://adventofcode.com/2022/day/2">Advent of Code Challenge</a>
+            <pre id="answer"></pre>
+            <pre id="output"></pre>
+            
+            <script type="text/javascript">
+
+                document.getElementById('inputfile').addEventListener('change', function() {
+                    
+                    var fileReader = new FileReader();
+                    fileReader.onload = function(){
+                        var input = fileReader.result;
+                        var totalScore = getTotalStrategyScore(input);
+
+                        var answer = 'Total score if everything goes exactly according to your strategy guide: ' + totalScore;
+
+                        document.getElementById('answer').textContent = answer;
+                        document.getElementById('output').textContent = input;
+                    }
+                    
+                    fileReader.readAsText(this.files[0]);
+                })
+
+                function getTotalStrategyScore(inputString){
+                    // a= rock;
+                    // b=paper;
+                    // c=sciccor;
+                    // x=lose;
+                    // y=draw;
+                    // z=win;
+
+                    var seperateRows = inputString.split('\r\n');
+
+                    var totalScore = 0;
+                    seperateRows.forEach(function(game){
+                        var strategy = game.split(' ');
+                        var openentChoice = strategy[0];
+                        var gameStrategy = strategy[1];
+
+                        switch(gameStrategy){
+                            case 'X':
+                                totalScore += 0;
+                                switch(openentChoice){
+                                    case 'A': 
+                                        totalScore += 3;
+                                        break;
+                                    case 'B': 
+                                        totalScore += 1;
+                                        break;
+                                    case 'C': 
+                                        totalScore += 2;
+                                        break;
+                                }
+                                break;
+                            case 'Y':
+                                totalScore += 3;
+                                switch(openentChoice){
+                                    case 'A': 
+                                        totalScore += 1;
+                                        break;
+                                    case 'B': 
+                                        totalScore += 2;
+                                        break;
+                                    case 'C': 
+                                        totalScore += 3;
+                                        break;
+                                }
+                                break;
+                            case 'Z':
+                                totalScore += 6;
+                                switch(openentChoice){
+                                    case 'A': 
+                                        totalScore += 2;
+                                        break;
+                                    case 'B': 
+                                        totalScore += 3;
+                                        break;
+                                    case 'C': 
+                                        totalScore += 1;
+                                        break;
+                                }
+                                break;
+                        }
+                    });
+
+                    return totalScore;
+                }
+            </script>
+        </body>
+</html>

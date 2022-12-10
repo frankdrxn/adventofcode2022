@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+    <html>
+    
+        <head>
+            <title>Tuning Trouble 2</title>
+        </head>
+        
+        <body>
+            <label for="inputfile">Load input:</label>
+            <input type="file" name="inputfile" id="inputfile">
+            <h1>Tuning Trouble 2</h1>
+            <a href="https://adventofcode.com/2022/day/6">Advent of Code Challenge</a>
+            <pre id="answer"></pre>
+            <pre id="output"></pre>
+            
+            <script type="text/javascript">
+
+                document.getElementById('inputfile').addEventListener('change', function() {
+                    
+                    var fileReader = new FileReader();
+                    fileReader.onload = function(){
+                        var input = fileReader.result;
+                        var totalScore = getFullOverlappingPairsCount(input, 14);
+
+                        var answer = 'Characters need to be processed before the first start-of-message marker is detected: ' + totalScore;
+
+                        document.getElementById('answer').textContent = answer;
+                        document.getElementById('output').textContent = input;
+                    }
+                    
+                    fileReader.readAsText(this.files[0]);
+                })
+
+                function getFullOverlappingPairsCount(inputString, uniqueLength){
+                    var lastFourChar = [];
+
+                    for (var i = 0; i < inputString.length; i++){
+                        lastFourChar.push(inputString[i]);
+
+                        if(lastFourChar.length > uniqueLength){
+                            lastFourChar.shift();
+                        }
+
+                        if (lastFourChar.length === uniqueLength && areDistinct(lastFourChar)){
+                            console.log(lastFourChar)
+                            return i + 1;
+                        }
+                    }
+                }
+
+                
+                function areDistinct(arr) {
+                    let n = arr.length;
+                    let s = new Set();
+                    for (let i = 0; i < n; i++) {
+                        s.add(arr[i]);
+                    }
+                    return (s.size == arr.length);
+                }
+            </script>
+        </body>
+</html>

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+    <html>
+    
+        <head>
+            <title>Treetop Tree House 2</title>
+        </head>
+        
+        <body>
+            <a href="https://adventofcode.com/2022/day/8" target="_blank">Advent of Code Challenge</a>
+            <h1>Treetop Tree House 2</h1>
+            
+            <label for="inputfile">Load input:</label>
+            <input type="file" name="inputfile" id="inputfile">
+            
+            <pre id="answer"></pre>
+            <pre id="output"></pre>
+            
+            <script type="text/javascript">
+
+                document.getElementById('inputfile').addEventListener('change', function() {
+                    
+                    var fileReader = new FileReader();
+                    fileReader.onload = function(){
+                        var input = fileReader.result;
+                        console.time('timer');
+                        var answer = numberOfTreesVisible(input);
+                        console.timeEnd('timer');
+
+                        var answerOutput = 'Highest scenic score in grid: ' + answer;
+
+                        document.getElementById('answer').textContent = answerOutput;
+                        document.getElementById('output').textContent = input;
+                    }
+                    
+                    fileReader.readAsText(this.files[0]);
+                })
+
+                function numberOfTreesVisible(inputString){
+                    var treesVisible = 0;
+                    var treeMatrix = [];
+
+                    var inputRows = inputString.split('\r\n');
+                    // Fills matrix and checks view from left
+                    inputRows.forEach(function(inputRow){
+                        var treeRow = [];
+                        var treesHeightInRow = [];
+                        for (var i = 0; i < inputRow.length; i++){
+                            var treeHeight = parseInt(inputRow[i]);
+
+                            var tree = {
+                                height: treeHeight,
+                                viewLeft: 0,
+                                viewRight: 0,
+                                viewTop: 0,
+                                viewBottom: 0
+                            }
+
+                            var viewLength = 0;
+                            for (var j = treesHeightInRow.length -1; j > -1; j--){
+                                if (treesHeightInRow[j] < tree.height){
+                                    viewLength++;
+                                } else {
+                                    viewLength++;
+                                    break;
+                                }
+                            }
+                            treesHeightInRow.push(treeHeight);
+                            tree.viewLeft = viewLength;
+                            treeRow.push(tree);
+                        }
+                        treeMatrix.push(treeRow);
+                    });
+
+                    // Check view right;
+                    for (var i = 0; i < treeMatrix.length; i++){
+                        var treesHeightInRow = [];
+                        var highestIndex = treeMatrix[i].length -1
+                        for (var j = highestIndex; j > -1; j--){
+                            var viewLength = 0;
+                            var tree =  treeMatrix[i][j];
+                            for (var k = treesHeightInRow.length -1; k > -1; k--){
+                                if (treesHeightInRow[k] < tree.height){
+                                    viewLength++;
+                                } else {
+                                    viewLength++;
+                                    break;
+                                }
+                            }
+
+                            treesHeightInRow.push(tree.height);
+                            tree.viewRight = viewLength;
+                        }
+                    }
+
+                    // Check visibility top
+                    for (var i = 0; i < treeMatrix[0].length; i++){
+                        var highestIndex = treeMatrix.length;
+                        var treesHeightInColumn = [];
+                        for (var j = 0; j < highestIndex; j++){
+                            var viewLength = 0;
+                            var tree =  treeMatrix[j][i];
+                            for (var k = treesHeightInColumn.length -1; k > -1; k--){
+                                if (treesHeightInColumn[k] < tree.height){
+                                    viewLength++;
+                                } else {
+                                    viewLength++;
+                                    break;
+                                }
+                            }
+
+                            treesHeightInColumn.push(tree.height);
+                            tree.viewTop = viewLength;
+                        }  
+                    }
+
+                    // Check visibility bottom
+                    for (var i = 0; i < treeMatrix[0].length; i++){
+                        var highestIndex = treeMatrix.length -1
+                        var treesHeightInColumn = [];
+                        for (var j = highestIndex; j > -1; j--){
+                            var viewLength = 0;
+                            var tree =  treeMatrix[j][i];
+                            for (var k = treesHeightInColumn.length -1; k > -1; k--){
+                                if (treesHeightInColumn[k] < tree.height){
+                                    viewLength++;
+                                } else {
+                                    viewLength++;
+                                    break;
+                                }
+                            }
+
+                            treesHeightInColumn.push(tree.height);
+                            tree.viewBottom = viewLength;
+                        } 
+                    }
+
+                    // Count visible trees
+                    var allTreesScenicScore = [];
+                    for (var i = 0; i < treeMatrix.length; i++){
+                        var highestTreeFromRight = 0;
+                        var highestIndex = treeMatrix[i].length -1
+                        for (var j = 0; j < treeMatrix[i].length; j++){
+                            var tree =  treeMatrix[i][j];
+                            var score = tree.viewBottom * tree.viewTop * tree.viewLeft * tree.viewRight;
+                            allTreesScenicScore.push(score);
+                        }
+                    }
+
+                    allTreesScenicScore.sort(function(a,b){
+                        return a > b ? -1 : a < b ? 1 : 0;
+                    });
+
+                    console.log(allTreesScenicScore);
+                    console.log(treeMatrix);
+
+                    return allTreesScenicScore[0];
+                }
+
+            </script>
+        </body>
+</html>

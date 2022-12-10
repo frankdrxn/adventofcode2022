@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+    <html>
+    
+        <head>
+            <title>2</title>
+        </head>
+        
+        <body>
+            <a href="https://adventofcode.com/2022/day/" target="_blank">Advent of Code Challenge</a>
+            <h1>2</h1>
+            
+            <label for="inputfile">Load input:</label>
+            <input type="file" name="inputfile" id="inputfile">
+            
+            <pre id="answer"></pre>
+            <pre id="output"></pre>
+            
+            <script type="text/javascript">
+
+                document.getElementById('inputfile').addEventListener('change', function() {
+                    
+                    var fileReader = new FileReader();
+                    fileReader.onload = function(){
+                        var input = fileReader.result;
+                        console.time('timer');
+                        var answer = doSomething(input);
+                        console.timeEnd('timer');
+
+                        var answerOutput = '' + answer;
+
+                        document.getElementById('answer').textContent = answerOutput;
+                        document.getElementById('output').textContent = input;
+                    }
+                    
+                    fileReader.readAsText(this.files[0]);
+                })
+
+                function doSomething(inputString){
+                    return;
+                }
+
+            </script>
+        </body>
+</html>

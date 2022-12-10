@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+    <html>
+    
+        <head>
+            <title>Calorie Counting 2</title>
+        </head>
+        
+        <body>
+            <label for="inputfile">Load input:</label>
+            <input type="file" name="inputfile" id="inputfile">
+            <br>
+        
+            <h1>Calorie Counting</h1>
+            <a href="https://adventofcode.com/2022/day/1">Advent of Code Challenge</a>
+            <pre id="answer"></pre>
+            <pre id="output"></pre>
+            
+            <script type="text/javascript">
+
+                document.getElementById('inputfile').addEventListener('change', function() {
+                    
+                    var fileReader = new FileReader();
+                    fileReader.onload = function(){
+                        var input = fileReader.result;
+                        var elfWithMostCalories = getElvesWithMostCalories(input);
+
+                        var answer = 'Top 3 Elves carrying the most Calories total Calories count combined is: ' + elfWithMostCalories.combinedCalories;
+
+                        document.getElementById('answer').textContent = answer;
+                        document.getElementById('output').textContent = input;
+                    }
+                    
+                    fileReader.readAsText(this.files[0]);
+                })
+
+                function getElvesWithMostCalories(inputString){
+                    var seperateRows = inputString.split('\r\n');
+
+                    var currentElfCalories = 0;
+                    var mostCalories = 0;
+                    var secondMost = 0;
+                    var thirdMost = 0;
+
+                    var elfWithMostCalories = 0;
+                    var second = 0;
+                    var third = 0;
+                    
+                    var elfIndex = 1;
+                    seperateRows.forEach(function(row){
+                        var calories = parseInt(row);
+                        if (calories){
+                            currentElfCalories += calories;
+                        } else {
+                            if (currentElfCalories >= mostCalories) {
+                                thirdMost = secondMost;
+                                third = second;
+                                
+                                secondMost = mostCalories;
+                                second = elfWithMostCalories;
+                                
+                                mostCalories = currentElfCalories;
+                                elfWithMostCalories = elfIndex;
+
+                            } else if (currentElfCalories >= secondMost) {
+                                thirdMost = secondMost;
+                                third = second;
+                                
+                                secondMost = currentElfCalories;
+                                second = elfIndex;
+                            } else if (currentElfCalories >= thirdMost) {
+                                thirdMost = currentElfCalories;
+                                third = elfIndex;
+                            }
+
+                            elfIndex++;
+                            currentElfCalories = 0;
+                        }
+                    });
+
+                    return {
+                        combinedCalories: mostCalories + secondMost + thirdMost,
+                        mostCalories: mostCalories,
+                        elfWithMostCalories: elfWithMostCalories,
+                        secondMost: secondMost,
+                        second: second,
+                        thirdMost: thirdMost,
+                        third: third
+                    }
+                }
+            </script>
+        </body>
+</html>

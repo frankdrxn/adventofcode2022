@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+    <html>
+    
+        <head>
+            <title>Camp Cleanup 2</title>
+        </head>
+        
+        <body>
+            <label for="inputfile">Load input:</label>
+            <input type="file" name="inputfile" id="inputfile">
+            <h1>Camp Cleanup 2</h1>
+            <a href="https://adventofcode.com/2022/day/4">Advent of Code Challenge</a>
+            <pre id="answer"></pre>
+            <pre id="output"></pre>
+            
+            <script type="text/javascript">
+
+                document.getElementById('inputfile').addEventListener('change', function() {
+                    
+                    var fileReader = new FileReader();
+                    fileReader.onload = function(){
+                        var input = fileReader.result;
+                        var totalScore = getOverlappingPairsCount(input);
+
+                        var answer = 'Amount of assignment pairs where the ranges overlap: ' + totalScore;
+
+                        document.getElementById('answer').textContent = answer;
+                        document.getElementById('output').textContent = input;
+                    }
+                    
+                    fileReader.readAsText(this.files[0]);
+                })
+
+                function getOverlappingPairsCount(inputString){
+
+                    var seperateRows = inputString.split('\r\n');
+
+                    var totalFullOverlappingPair = 0;
+                    seperateRows.forEach(function(elfPair){
+                        var elfPairSlit = elfPair.split(',');
+                        
+                        var firstElfWork = elfPairSlit[0].split('-');
+                        var firstElfStart = parseInt(firstElfWork[0]);
+                        var firstElfEnd = parseInt(firstElfWork[1]);
+
+                        var secondElfWork = elfPairSlit[1].split('-');
+                        var secondElfStart = parseInt(secondElfWork[0]);
+                        var secondElfEnd = parseInt(secondElfWork[1]);
+
+                        if (firstElfEnd >= secondElfStart && firstElfStart <= secondElfEnd){
+                            totalFullOverlappingPair++;
+                            return;
+                        }
+
+                        if (secondElfEnd >= firstElfStart && secondElfStart <= firstElfEnd){
+                            totalFullOverlappingPair++;
+                            return;
+                        }
+                    });
+
+                    return totalFullOverlappingPair;
+                }
+            </script>
+        </body>
+</html>

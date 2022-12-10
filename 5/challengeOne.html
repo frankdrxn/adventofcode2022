@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+    <html>
+    
+        <head>
+            <title>Supply Stacks</title>
+        </head>
+        
+        <body>
+            <label for="inputfile">Load input:</label>
+            <input type="file" name="inputfile" id="inputfile">
+            <h1>Supply Stacks</h1>
+            <a href="https://adventofcode.com/2022/day/5">Advent of Code Challenge</a>
+            <pre id="answer"></pre>
+            <pre id="output"></pre>
+            
+            <script type="text/javascript">
+
+                document.getElementById('inputfile').addEventListener('change', function() {
+                    
+                    var fileReader = new FileReader();
+                    fileReader.onload = function(){
+                        var input = fileReader.result;
+                        var totalScore = getTopCratesAfterInstructions(input);
+
+                        var answer = 'The crate that ends up on top of each stack: ' + totalScore;
+
+                        document.getElementById('answer').textContent = answer;
+                        document.getElementById('output').textContent = input;
+                    }
+                    
+                    fileReader.readAsText(this.files[0]);
+                })
+
+                function getTopCratesAfterInstructions(inputString){
+
+                    var instructionsStart = inputString.indexOf('move');
+
+                    var instructions = inputString.substring(instructionsStart, inputString.length);
+                    var pilesDescription = inputString.substring(0, instructionsStart);
+
+                    instructionSteps = instructions.split('\r\n');
+
+                    var pileNumberStart = pilesDescription.indexOf('1');
+                    pilesDescription = pilesDescription.substring(0, pileNumberStart);
+
+                    var pilesPerRow = pilesDescription.split('\r\n');
+
+                    var piles = [];
+
+                    pilesPerRow.forEach(function(row){
+                        var counter = 0;
+                        for (var i = 1; i < row.length; i+=4){
+
+                            if(row[i] && row[i] !== '[' && row[i] !== ']' && row[i] !== ' '){
+                                if(piles[counter]){
+                                    piles[counter].unshift(row[i]);
+                                }else {
+                                    piles[counter] = [row[i]]
+                                }
+                            }
+                            counter++;
+                        }
+                    });
+
+                    instructionSteps.forEach(function(instruction){
+                        var pileToMove = null;
+                        var amountToMove = null;
+                        var pileToMoveTo = null;
+
+                        var splitInstructions = instruction.split(' ');
+                        splitInstructions.forEach(function(split, index){
+                            if(index === 1){
+                                amountToMove = parseInt(split);
+                            }
+                            if(index === 3){
+                                pileToMove = parseInt(split) - 1;
+                            }
+                            if(index === 5){
+                                pileToMoveTo = parseInt(split) - 1;
+                            }
+                        });
+
+                        
+                        for (var j = 0; j < amountToMove; j++){
+                            var itemToMove = piles[pileToMove].pop();
+                            piles[pileToMoveTo].push(itemToMove);
+                        }
+                    });
+
+
+                    var topLevelItems = '';
+                    piles.forEach(function (pile){
+                        topLevelItems += pile[pile.length -1];
+                    });
+
+                    return topLevelItems;
+                }
+            </script>
+        </body>
+</html>

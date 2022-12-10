@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+    <html>
+    
+        <head>
+            <title>Calorie Counting</title>
+        </head>
+        
+        <body>
+            <label for="inputfile">Load input:</label>
+            <input type="file" name="inputfile" id="inputfile">
+            <h1>Calorie Counting</h1>
+            <a href="https://adventofcode.com/2022/day/1">Advent of Code Challenge</a>
+            <pre id="answer"></pre>
+            <pre id="output"></pre>
+            
+            <script type="text/javascript">
+
+                document.getElementById('inputfile').addEventListener('change', function() {
+                    
+                    var fileReader = new FileReader();
+                    fileReader.onload = function(){
+                        var input = fileReader.result;
+                        console.time('timer');
+                        var elfWithMostCalories = getElfWithMostCalories(input);
+                        console.timeEnd('timer');
+
+                        var answer = 'Elf carrying the most Calories total Calories count is: ' + elfWithMostCalories.mostCalories + '\n' + 'Elf# ' + elfWithMostCalories.elfWithMostCalories;
+
+                        document.getElementById('answer').textContent = answer;
+                        document.getElementById('output').textContent = input;
+                    }
+                    
+                    fileReader.readAsText(this.files[0]);
+                })
+
+                function getElfWithMostCalories(inputString){
+                    var seperateRows = inputString.split('\r\n');
+
+                    var currentElfCalories = 0;
+                    var mostCalories = 0;
+                    var elfWithMostCalories = 0;
+                    var elfIndex = 1;
+                    seperateRows.forEach(function(row){
+                        var calories = parseInt(row);
+                        if (calories){
+                            currentElfCalories += calories;
+                        } else {
+                            if(currentElfCalories > mostCalories){
+                                mostCalories = currentElfCalories;
+                                elfWithMostCalories = elfIndex;
+                            }
+
+                            elfIndex++;
+                            currentElfCalories = 0;
+                        }
+                    });
+
+                    return {
+                        mostCalories: mostCalories,
+                        elfWithMostCalories: elfWithMostCalories
+                    }
+                }
+            </script>
+        </body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+    <html>
+    
+        <head>
+            <title>Cathode-Ray Tube 2</title>
+        </head>
+        
+        <body>
+            <a href="https://adventofcode.com/2022/day/10" target="_blank">Advent of Code Challenge</a>
+            <h1>Cathode-Ray Tube 2</h1>
+            
+            <label for="inputfile">Load input:</label>
+            <input type="file" name="inputfile" id="inputfile">
+            
+            <pre id="answer"></pre>
+            <pre id="output"></pre>
+            
+            <script type="text/javascript">
+
+                document.getElementById('inputfile').addEventListener('change', function() {
+                    
+                    var fileReader = new FileReader();
+                    fileReader.onload = function(){
+                        var input = fileReader.result;
+                        console.time('timer');
+                        var answer = getScreenOutput(input);
+                        console.timeEnd('timer');
+
+                        var answerOutput = 'Lettes on CRT screen: ' + answer;
+
+                        document.getElementById('answer').textContent = answer;
+                        document.getElementById('output').textContent = input;
+                    }
+                    
+                    fileReader.readAsText(this.files[0]);
+                })
+
+                function getScreenOutput(inputString){
+                    var instructions = inputString.split('\r\n');
+                    var instructionRow = 0;
+
+                    var screenWidth = 40;
+                    var screenHeight = 6;
+                    var screen = [];
+                    for (var i = 0; i < screenHeight; i++){
+                        screen.push(new Array(screenWidth).fill(null).map(()=> ('.')))
+                    }                    
+
+                    var registerX = 1;
+                    var cycleTillNextInstruction = 1;
+                    var numberToAddToRegister = null;
+                    for ( var cycle = 1; cycle <= cycleTillNextInstruction; cycle++){
+                        if (cycleTillNextInstruction === cycle && instructions.length > instructionRow){
+                            var instructionDisect = instructions[instructionRow].split(' ');
+                            switch (instructionDisect[0]){
+                                case ('noop'): 
+                                    cycleTillNextInstruction = cycle + 1;
+                                    break;
+                                case ('addx'):  
+                                    cycleTillNextInstruction = cycle + 2;
+                                    numberToAddToRegister += parseInt(instructionDisect[1]);
+                                    break;
+                            }
+                            instructionRow++
+                        }
+
+                        var spriteRange = [registerX - 1, registerX, registerX +1];
+                        var screenCordinates = {
+                            x: ((cycle-1) % screenWidth),
+                            y: Math.floor((cycle-1) / screenWidth)
+                        }
+
+                        if (spriteRange.indexOf(screenCordinates.x) > -1 && !(screenCordinates.y >= screenHeight)){
+                            screen[screenCordinates.y][screenCordinates.x] = '#';
+                        }
+
+                        if(numberToAddToRegister && cycle === cycleTillNextInstruction - 1){
+                            registerX += numberToAddToRegister;
+                            numberToAddToRegister = null;
+                        } 
+                    }
+                    
+                    return screen.reduce((sum, row) => sum + '\n'+ row.join(''), '');
+                }
+
+            </script>
+        </body>
+</html>

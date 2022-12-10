@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+    <html>
+    
+        <head>
+            <title>Rope Bridge</title>
+        </head>
+        
+        <body>
+            <a href="https://adventofcode.com/2022/day/9" target="_blank">Advent of Code Challenge</a>
+            <h1>Rope Bridge</h1>
+            
+            <label for="inputfile">Load input:</label>
+            <input type="file" name="inputfile" id="inputfile">
+            
+            <pre id="answer"></pre>
+            <pre id="output"></pre>
+            
+            <script type="text/javascript">
+
+                document.getElementById('inputfile').addEventListener('change', function() {
+                    
+                    var fileReader = new FileReader();
+                    fileReader.onload = function(){
+                        var input = fileReader.result;
+                        console.time('timer');
+                        var totalScore = getAmountOfPosVisitidByTail(input);
+                        console.timeEnd('timer');
+
+                        var answer = 'Amount of positions the tail of the rope visit at least once: ' + totalScore;
+
+                        document.getElementById('answer').textContent = answer;
+                        document.getElementById('output').textContent = input;
+                    }
+                    
+                    fileReader.readAsText(this.files[0]);
+                })
+
+                function getAmountOfPosVisitidByTail(inputString){
+                    var head = {
+                        x: 0,
+                        y: 0
+                    };
+                    var tail = {
+                        x: 0,
+                        y: 0
+                    };
+                   
+                    var instructions = inputString.split('\r\n');
+
+                    var visitedPositions = new Set();
+                    // Add the starting position of the last knot.
+                    visitedPositions.add(tail.x + ',' + tail.y);
+
+                    instructions.forEach(function(move){
+                        var moveDisect = move.split(' ');
+                        var direction = moveDisect[0];
+                        var steps = moveDisect[1];
+                        debugger;
+                        for( var i = 0; i < steps; i++){
+                            moveKnot(head, direction);
+                            visitedPositions.add(followKnot(head, tail));
+                        }
+                    });
+
+                    return visitedPositions.size;
+
+                    function moveKnot(knot, direction){
+                        switch(direction){
+                            case 'U':
+                                knot.y++;
+                                break;
+                            case 'D': 
+                                knot.y--;
+                                break;
+                            case 'R': 
+                                knot.x++;                                 
+                                break;
+                            case 'L':
+                                knot.x--         
+                                break;
+                        }
+                        return knot.x + ',' + knot.y;
+                    }
+
+                    function followKnot(knotToFollow, knot, direction, isStart){
+                        var distance = Math.max(
+                            Math.abs(knot.x - knotToFollow.x),
+                            Math.abs(knot.y - knotToFollow.y),
+                        )
+
+                        if (distance > 1) {
+                            var dirX = knotToFollow.x - knot.x;
+                            knot.x += Math.abs(dirX) === 2 ? dirX / 2 : dirX;
+                            var dirY = knotToFollow.y - knot.y;
+                            knot.y += Math.abs(dirY) === 2 ? dirY / 2 : dirY;
+                        }
+                        
+                        return knot.x + ',' + knot.y;
+                    }
+
+                }
+
+            </script>
+        </body>
+</html>

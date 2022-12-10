@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+    <html>
+    
+        <head>
+            <title>Cathode-Ray Tube</title>
+        </head>
+        
+        <body>
+            <a href="https://adventofcode.com/2022/day/10" target="_blank">Advent of Code Challenge</a>
+            <h1>Cathode-Ray Tube</h1>
+            
+            <label for="inputfile">Load input:</label>
+            <input type="file" name="inputfile" id="inputfile">
+            
+            <pre id="answer"></pre>
+            <pre id="output"></pre>
+            
+            <script type="text/javascript">
+
+                document.getElementById('inputfile').addEventListener('change', function() {
+                    
+                    var fileReader = new FileReader();
+                    fileReader.onload = function(){
+                        var input = fileReader.result;
+                        console.time('timer');
+                        var answer = getSumSignalStrength(input);
+                        console.timeEnd('timer');
+
+                        var answerOutput = 'Sum of these six signal strengths is: ' + answer;
+
+                        document.getElementById('answer').textContent = answer;
+                        document.getElementById('output').textContent = input;
+                    }
+                    
+                    fileReader.readAsText(this.files[0]);
+                })
+
+                function getSumSignalStrength(inputString){
+                    var instructions = inputString.split('\r\n');
+                    var instructionRow = 0;
+
+                    var signalStrengths = [];
+                    
+                    var registerX = 1;
+                    var numberToAddToRegister = null;
+                    var cycleTillNextInstruction = 1;
+                    for (var cycle = 1; cycle <= cycleTillNextInstruction; cycle++) {
+                        
+                        if ((cycle - 20) % 40 === 0){
+                            signalStrengths.push(cycle * registerX);
+                        }
+
+                        if (cycleTillNextInstruction === cycle && instructions.length > instructionRow){
+                            var instructionDisect = instructions[instructionRow].split(' ');
+                            switch (instructionDisect[0]){
+                                case ('noop'): 
+                                    cycleTillNextInstruction = cycle + 1;
+                                    break;
+                                case ('addx'):  
+                                    cycleTillNextInstruction = cycle + 2;
+                                    numberToAddToRegister += parseInt(instructionDisect[1]);
+                                    break;
+                            }
+                            instructionRow++
+                        }
+
+                        if(numberToAddToRegister && cycle === cycleTillNextInstruction - 1){
+                            registerX += numberToAddToRegister;
+                            numberToAddToRegister = null;
+                        } 
+                    }
+
+                    return signalStrengths.reduce((sum, value) => value + sum, 0);
+                }
+
+            </script>
+        </body>
+</html>
