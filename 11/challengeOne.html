@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+    <html>
+    
+        <head>
+            <title>Monkey in the Middle</title>
+        </head>
+        
+        <body>
+            <a href="https://adventofcode.com/2022/day/" target="_blank">Advent of Code Challenge</a>
+            <h1>Monkey in the Middle</h1>
+            
+            <label for="inputfile">Load input:</label>
+            <input type="file" name="inputfile" id="inputfile">
+            
+            <pre id="answer"></pre>
+            <pre id="output"></pre>
+            
+            <script type="text/javascript">
+
+                document.getElementById('inputfile').addEventListener('change', function() {
+                    
+                    var fileReader = new FileReader();
+                    fileReader.onload = function(){
+                        var input = fileReader.result;
+                        console.time('timer');
+                        var answer = doSomething(input);
+                        console.timeEnd('timer');
+
+                        var answerOutput = 'The level of monkey business after 20 rounds: ' + answer;
+
+                        document.getElementById('answer').textContent = answerOutput;
+                        document.getElementById('output').textContent = input;
+                    }
+                    
+                    fileReader.readAsText(this.files[0]);
+                })
+
+                function doSomething(inputString){
+                    var monkeyDescriptions = inputString.split('\r\n\r\n');
+
+                    // Create Monkeys
+                    var monkeys = [];
+                    monkeyDescriptions.forEach(function(monkeyDescription){
+                        monkeyDescriptionDisect = monkeyDescription.split('\r\n');
+
+                        var items = monkeyDescriptionDisect[1].split(': ')[1].split(', ');
+                        var operationOperator = monkeyDescriptionDisect[2].charAt(monkeyDescriptionDisect[2].indexOf('old') + 4);
+                        var operationNumber = parseInt(monkeyDescriptionDisect[2].split(operationOperator + ' ')[1]);
+                        var testNumber = parseInt(monkeyDescriptionDisect[3].split('by ')[1]);
+                        var trueMonkey = parseInt(monkeyDescriptionDisect[4].split('monkey ')[1]);
+                        var falseMonkey = parseInt(monkeyDescriptionDisect[5].split('monkey ')[1]);
+
+                        monkeys.push(new Monkey(items, operationOperator, operationNumber, testNumber, trueMonkey, falseMonkey));
+                    });
+
+                    // Do rounds
+                    for (var i = 0; i < 20; i++){
+                        monkeys.forEach(function(monkey){
+                            var monkeyItems = monkey.getItems();
+
+                            while (monkeyItems.length > 0){
+                                var item = monkeyItems.shift();
+                                var monkeyRecipient = monkey.selectRecipient(item);
+                                monkeys[monkeyRecipient.recipient].receiveItem(monkeyRecipient.worryLevel);
+                            }
+                                
+                        });
+                    }
+
+                    // Sort on inspection count
+                    monkeys.sort(function(a, b){
+                        return a.inspectCount > b.inspectCount ? -1 : a.inspectCount < b.inspectCount ? 1 : 0
+                    })
+
+                    return monkeys[0].inspectCount * monkeys[1].inspectCount;
+                }
+
+                class Monkey {
+                    constructor(items, operationOperator, operationNumber, testNumber, trueMonkey, falseMonkey){
+                        this.items = items.map(function(i){
+                            return parseInt(i);
+                        });
+                        this.operationOperator = operationOperator;
+                        this.operatorNumber = operationNumber;
+                        this.operatorNumber = operationNumber;
+                        this.testNumber = testNumber;
+                        this.trueMonkey = trueMonkey;
+                        this.falseMonkey = falseMonkey;
+                        this.inspectCount = 0;
+                    }
+
+                    getItems(){
+                        return this.items;
+                    }
+
+                    getSpecificItem(index) {
+                        return this.items[index];
+                    }
+
+                    inspectItem(item){
+                        this.inspectCount++;
+                        var operatorValue = isNaN(this.operatorNumber) ? item : this.operatorNumber;
+                        switch (this.operationOperator){
+                            case '+':
+                                return item += operatorValue;
+                            case '*':
+                                return item *= operatorValue;
+                        }
+                    }
+
+                    selectRecipient(item){
+                        var worryLevel = this.inspectItem(item);
+                        worryLevel = Math.floor(worryLevel / 3);
+
+                        var recipient = worryLevel % this.testNumber === 0 ? this.trueMonkey : this.falseMonkey;
+
+                        return {
+                            recipient: recipient,
+                            worryLevel: worryLevel
+                        }
+                    }
+
+                    receiveItem(item){
+                        this.items.push(item);
+                    }
+                }
+
+            </script>
+        </body>
+</html>
